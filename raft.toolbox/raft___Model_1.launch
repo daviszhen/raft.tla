@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.lamport.tla.toolbox.tool.tlc.modelCheck">
+    <stringAttribute key="configurationName" value="Model_1"/>
+    <intAttribute key="distributedFPSetCount" value="0"/>
+    <stringAttribute key="distributedNetworkInterface" value="169.254.47.183"/>
+    <intAttribute key="distributedNodesCount" value="1"/>
+    <stringAttribute key="distributedTLC" value="off"/>
+    <intAttribute key="fpIndex" value="26"/>
+    <intAttribute key="maxHeapSize" value="25"/>
+    <stringAttribute key="modelBehaviorInit" value=""/>
+    <stringAttribute key="modelBehaviorNext" value=""/>
+    <stringAttribute key="modelBehaviorSpec" value="Spec"/>
+    <intAttribute key="modelBehaviorSpecType" value="1"/>
+    <stringAttribute key="modelBehaviorVars" value="elections, messages, matchIndex, log, state, allLogs, commitIndex, currentTerm, votesResponded, nextIndex, votesGranted, voterLog, votedFor"/>
+    <stringAttribute key="modelComments" value=""/>
+    <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
+    <listAttribute key="modelCorrectnessInvariants">
+        <listEntry value="1\lnot MoreThanOneLeader"/>
+    </listAttribute>
+    <listAttribute key="modelCorrectnessProperties"/>
+    <intAttribute key="modelEditorOpenTabs" value="6"/>
+    <stringAttribute key="modelExpressionEval" value=""/>
+    <stringAttribute key="modelParameterActionConstraint" value=""/>
+    <listAttribute key="modelParameterConstants">
+        <listEntry value="AppendEntriesResponse;;AppendEntriesResponse;1;0"/>
+        <listEntry value="Follower;;Follower;1;0"/>
+        <listEntry value="Leader;;Leader;1;0"/>
+        <listEntry value="Nil;;Nil;1;0"/>
+        <listEntry value="RequestVoteResponse;;RequestVoteResponse;1;0"/>
+        <listEntry value="Candidate;;Candidate;1;0"/>
+        <listEntry value="RequestVoteRequest;;RequestVoteRequest;1;0"/>
+        <listEntry value="AppendEntriesRequest;;AppendEntriesRequest;1;0"/>
+        <listEntry value="Value;;{1};0;0"/>
+        <listEntry value="Server;;{a1, a2, a3};1;0"/>
+    </listAttribute>
+    <stringAttribute key="modelParameterContraint" value="/\ \A i \in Server:currentTerm[i]&lt;3&#13;&#10;/\ \A i \in Server:Len(log[i]) &lt; 3"/>
+    <listAttribute key="modelParameterDefinitions"/>
+    <stringAttribute key="modelParameterModelValues" value="{}"/>
+    <stringAttribute key="modelParameterNewDefinitions" value=""/>
+    <intAttribute key="numberOfWorkers" value="3"/>
+    <stringAttribute key="result.mail.address" value=""/>
+    <stringAttribute key="specName" value="raft"/>
+    <stringAttribute key="tlcResourcesProfile" value="local custom"/>
+</launchConfiguration>
