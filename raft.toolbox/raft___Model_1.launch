@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.lamport.tla.toolbox.tool.tlc.modelCheck">
+    <stringAttribute key="TLCCmdLineParameters" value=""/>
+    <intAttribute key="collectCoverage" value="1"/>
     <stringAttribute key="configurationName" value="Model_1"/>
+    <booleanAttribute key="deferLiveness" value="false"/>
+    <intAttribute key="dfidDepth" value="100"/>
+    <booleanAttribute key="dfidMode" value="false"/>
     <intAttribute key="distributedFPSetCount" value="0"/>
     <stringAttribute key="distributedNetworkInterface" value="169.254.47.183"/>
     <intAttribute key="distributedNodesCount" value="1"/>
     <stringAttribute key="distributedTLC" value="off"/>
-    <intAttribute key="fpIndex" value="26"/>
+    <stringAttribute key="distributedTLCVMArgs" value=""/>
+    <intAttribute key="fpBits" value="1"/>
+    <intAttribute key="fpIndex" value="35"/>
+    <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="25"/>
+    <intAttribute key="maxSetSize" value="1000000"/>
+    <booleanAttribute key="mcMode" value="false"/>
     <stringAttribute key="modelBehaviorInit" value=""/>
     <stringAttribute key="modelBehaviorNext" value=""/>
     <stringAttribute key="modelBehaviorSpec" value="Spec"/>
     <intAttribute key="modelBehaviorSpecType" value="1"/>
-    <stringAttribute key="modelBehaviorVars" value="elections, messages, matchIndex, log, state, allLogs, commitIndex, currentTerm, votesResponded, nextIndex, votesGranted, voterLog, votedFor"/>
+    <stringAttribute key="modelBehaviorVars" value="elections, committedLogDecrease, messages, clientRequests, matchIndex, log, state, allLogs, commitIndex, currentTerm, votesResponded, committedLog, nextIndex, votesGranted, voterLog, votedFor"/>
     <stringAttribute key="modelComments" value=""/>
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
         <listEntry value="1\lnot MoreThanOneLeader"/>
+        <listEntry value="1\lnot committedLogDecrease"/>
+        <listEntry value="0clientRequests &lt; 5"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties"/>
     <intAttribute key="modelEditorOpenTabs" value="6"/>
@@ -31,14 +43,20 @@
         <listEntry value="RequestVoteRequest;;RequestVoteRequest;1;0"/>
         <listEntry value="AppendEntriesRequest;;AppendEntriesRequest;1;0"/>
         <listEntry value="Value;;{1};0;0"/>
-        <listEntry value="Server;;{a1, a2, a3};1;0"/>
+        <listEntry value="Server;;{&quot;a1&quot;, &quot;a2&quot;, &quot;a3&quot;};0;0"/>
     </listAttribute>
-    <stringAttribute key="modelParameterContraint" value="/\ \A i \in Server:currentTerm[i]&lt;3&#13;&#10;/\ \A i \in Server:Len(log[i]) &lt; 3"/>
+    <stringAttribute key="modelParameterContraint" value="/\ \A i \in Server:currentTerm[i]&lt;3&#13;&#10;/\ clientRequests &lt; 3"/>
     <listAttribute key="modelParameterDefinitions"/>
     <stringAttribute key="modelParameterModelValues" value="{}"/>
     <stringAttribute key="modelParameterNewDefinitions" value=""/>
     <intAttribute key="numberOfWorkers" value="3"/>
+    <booleanAttribute key="recover" value="false"/>
     <stringAttribute key="result.mail.address" value=""/>
+    <intAttribute key="simuAril" value="-1"/>
+    <intAttribute key="simuDepth" value="100"/>
+    <intAttribute key="simuSeed" value="-1"/>
     <stringAttribute key="specName" value="raft"/>
     <stringAttribute key="tlcResourcesProfile" value="local custom"/>
+    <stringAttribute key="view" value=""/>
+    <booleanAttribute key="visualizeStateGraph" value="false"/>
 </launchConfiguration>

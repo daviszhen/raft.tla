@@ -61,6 +61,9 @@ VARIABLE votedFor
 \* serverVar 有序元组<currentTerm, state, votedFor>
 serverVars == <<currentTerm, state, votedFor>>
 
+\* The set of requests that can go into the log
+VARIABLE clientRequests
+
 \* 日志，entry数组
 \* A Sequence of log entries. The index into this sequence is the index of the
 \* log entry. Unfortunately, the Sequence module defines Head(s) as the entry
@@ -69,8 +72,12 @@ VARIABLE log
 \* The index of the latest entry in the log the state machine may apply.
 VARIABLE commitIndex
 
+\* The index that gets committed
+VARIABLE committedLog
+\* Does the commited Index decrease
+VARIABLE committedLogDecrease
 \* 有序元组<log, commitIndex>
-logVars == <<log, commitIndex>>
+logVars == <<log, commitIndex, clientRequests, committedLog, committedLogDecrease>>
 
 \* 只在candidate上用的变量
 \* The following variables are used only on candidates:
@@ -151,6 +158,9 @@ WithoutMessage(m, msgs) ==
     ELSE
         msgs
 
+ValidMessage(msgs) ==
+    { m \in DOMAIN messages : msgs[m] > 0 }
+
 \* 定义运算符Send(m)
 \* messages在下个状态的值 等于 messages增加m
 \* Add a message to the bag of messages.
@@ -210,6 +220,9 @@ InitLeaderVars == /\ nextIndex  = [i \in Server |-> [j \in Server |-> 1]]
 \* commitIndex初始值为函数f[i] = 0，当i在Server中
 InitLogVars == /\ log          = [i \in Server |-> << >>]
                /\ commitIndex  = [i \in Server |-> 0]
+               /\ clientRequests = 1
+               /\ committedLog = <<>>
+               /\ committedLogDecrease = FALSE
 
 \* messages初始值为函数f[i] = 0，当i在Server中 ????
 Init == /\ messages = [m \in {} |-> 0]
@@ -235,9 +248,8 @@ Restart(i) ==
     /\ nextIndex'      = [nextIndex EXCEPT ![i] = [j \in Server |-> 1]] \* nextIndex[i][j]=1
     /\ matchIndex'     = [matchIndex EXCEPT ![i] = [j \in Server |-> 0]]    \* matchIndex[i][j]=0
     /\ commitIndex'    = [commitIndex EXCEPT ![i] = 0]  \* commitIndex[i]=0
-    /\ votedFor' = [votedFor EXCEPT ![i] = Nil]
     \* 元组<messages, currentTerm, votedFor, log, elections>保持不变
-    /\ UNCHANGED <<messages, currentTerm,  log, elections>>
+    /\ UNCHANGED <<messages, currentTerm,votedFor,log, elections, clientRequests, committedLog, committedLogDecrease>>
 
 \* 定义Timeout(i)运算符
 \* Server i 超时 并且 开始一个新的选举
@@ -324,14 +336,16 @@ BecomeLeader(i) ==
 \* 定义ClientRequest(i, v)运算符
 \* Leader i receives a client request to add v to the log.
 \* Leader i 接收了一个client 请求(添加v到日志)
-ClientRequest(i, v) ==
+ClientRequest(i) ==
     /\ state[i] = Leader    \* 只有leader能接收请求
     /\ LET entry == [term  |-> currentTerm[i],  \* 新Entry<currentTerm[i],v>
-                     value |-> v]
+                     value |-> clientRequests]
            newLog == Append(log[i], entry)  \* leader拼接entry到日志
-       IN  log' = [log EXCEPT ![i] = newLog]    \* log[i]变为newLog
+       IN  /\ log' = [log EXCEPT ![i] = newLog]    \* log[i]变为newLog
+           \* Make sure that each request is unique, reduce state space to be explored
+           /\ clientRequests' = clientRequests + 1
     /\ UNCHANGED <<messages, serverVars, candidateVars,
-                   leaderVars, commitIndex>>
+                   leaderVars, commitIndex, committedLog, committedLogDecrease>>
 
 \* 定义AdvanceCommitIndex(i)运算符
 \* Leader i advances its commitIndex.
@@ -359,7 +373,15 @@ AdvanceCommitIndex(i) ==
                   Max(agreeIndexes) \* 满足majority的index的最大值，要么如下不变
               ELSE
                   commitIndex[i] 
-       IN commitIndex' = [commitIndex EXCEPT ![i] = newCommitIndex] \* commitIndex[i]变为newCommitIndex
+           newCommittedLog ==
+              IF newCommitIndex > 1 THEN 
+                  [ j \in 1..newCommitIndex |-> log[i][j] ] 
+              ELSE 
+                   << >>
+       IN /\ commitIndex' = [commitIndex EXCEPT ![i] = newCommitIndex] \* commitIndex[i]变为newCommitIndex
+          /\ committedLogDecrease' = \/ ( newCommitIndex < Len(committedLog) )
+                                     \/ \E j \in 1..Len(committedLog) : committedLog[j] /= newCommittedLog[j]
+          /\ committedLog' = newCommittedLog
     /\ UNCHANGED <<messages, serverVars, candidateVars, leaderVars, log>>
 
 ----
@@ -479,14 +501,14 @@ HandleAppendEntriesRequest(i, j, m) ==
                        /\ LET new == [index2 \in 1..(Len(log[i]) - 1) |->   \*  删掉log[i]尾部的entry
                                           log[i][index2]]
                           IN log' = [log EXCEPT ![i] = new] \*  log[i] = new
-                       /\ UNCHANGED <<serverVars, commitIndex, messages>>
+                       /\ UNCHANGED <<serverVars, commitIndex, messages, clientRequests, committedLog, committedLogDecrease>>
                    \/ \* no conflict: append entry
                         \* 无冲突:  拼接entry
                        /\ m.mentries /= << >>   \* entries不为空
                        /\ Len(log[i]) = m.mprevLogIndex \* prevLogIndex刚好为Len(log[i])
                        /\ log' = [log EXCEPT ![i] =
                                       Append(log[i], m.mentries[1])]    \* log[i]拼接上entries[1]
-                       /\ UNCHANGED <<serverVars, commitIndex, messages>>
+                       /\ UNCHANGED <<serverVars, commitIndex, messages, clientRequests, committedLog, committedLogDecrease>>
        /\ UNCHANGED <<candidateVars, leaderVars>>
 
 \* 定义HandleAppendEntriesResponse(i, j, m)运算符
@@ -568,12 +590,12 @@ Next == /\ \/ \E i \in Server : Restart(i)
            \/ \E i \in Server : Timeout(i)
            \/ \E i,j \in Server : RequestVote(i, j)
            \/ \E i \in Server : BecomeLeader(i)
-           \/ \E i \in Server, v \in Value : ClientRequest(i, v)
+           \/ \E i \in Server : ClientRequest(i)
            \/ \E i \in Server : AdvanceCommitIndex(i)
            \/ \E i,j \in Server : AppendEntries(i, j)
-           \/ \E m \in DOMAIN messages : Receive(m)
-           \/ \E m \in DOMAIN messages : DuplicateMessage(m)
-           \/ \E m \in DOMAIN messages : DropMessage(m)
+           \/ \E m \in ValidMessage(messages) : Receive(m)
+           \/ \E m \in ValidMessage(messages) : DuplicateMessage(m)
+           \/ \E m \in ValidMessage(messages) : DropMessage(m)
            \* History variable that tracks every log ever:
         /\ allLogs' = allLogs \cup {log[i] : i \in Server}
 
@@ -590,6 +612,11 @@ BothLeader( i, j ) ==
 
 MoreThanOneLeader ==
     \E i, j \in Server :  BothLeader( i, j )
+
+\* Lemma 1. Each server’s currentTerm monotonically increases
+\* 报错：The invariant CurrentTermMonotonicallyIncreases is not a state predicate (one with no primes or temporal operators).
+\* CurrentTermMonotonicallyIncreases ==
+\*    \A i \in Server : currentTerm[i] <= currentTerm'[i]
 
 ===============================================================================
 
