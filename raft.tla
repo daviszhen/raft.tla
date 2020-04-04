@@ -235,9 +235,8 @@ Restart(i) ==
     /\ nextIndex'      = [nextIndex EXCEPT ![i] = [j \in Server |-> 1]] \* nextIndex[i][j]=1
     /\ matchIndex'     = [matchIndex EXCEPT ![i] = [j \in Server |-> 0]]    \* matchIndex[i][j]=0
     /\ commitIndex'    = [commitIndex EXCEPT ![i] = 0]  \* commitIndex[i]=0
-    /\ votedFor' = [votedFor EXCEPT ![i] = Nil]
     \* 元组<messages, currentTerm, votedFor, log, elections>保持不变
-    /\ UNCHANGED <<messages, currentTerm,  log, elections>>
+    /\ UNCHANGED <<messages, currentTerm,votedFor,log, elections>>
 
 \* 定义Timeout(i)运算符
 \* Server i 超时 并且 开始一个新的选举
