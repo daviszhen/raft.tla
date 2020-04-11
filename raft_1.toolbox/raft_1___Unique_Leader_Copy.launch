@@ -13,11 +13,11 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value=""/>
     <intAttribute key="fpBits" value="6"/>
-    <intAttribute key="fpIndex" value="89"/>
+    <intAttribute key="fpIndex" value="0"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="39"/>
     <intAttribute key="maxSetSize" value="1000000"/>
-    <booleanAttribute key="mcMode" value="false"/>
+    <booleanAttribute key="mcMode" value="true"/>
     <stringAttribute key="modelBehaviorInit" value=""/>
     <stringAttribute key="modelBehaviorNext" value=""/>
     <stringAttribute key="modelBehaviorSpec" value="Spec"/>
@@ -37,6 +37,7 @@
         <listEntry value="1Lemma7TermGrowInLog"/>
         <listEntry value="1Lemma8ImmediatelyCommittedIsCommitted"/>
         <listEntry value="1Lemma9PrefixCommittedIsCommited"/>
+        <listEntry value="1Theorem1ServerApplyEntriesCommittedInCurrentTerm"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties"/>
     <intAttribute key="modelEditorOpenTabs" value="6"/>

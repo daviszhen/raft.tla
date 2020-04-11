@@ -688,10 +688,10 @@ Lemma8ImmediatelyCommittedIsCommitted ==
                         IF Cardinality(cset) = 1 /\ <<0,0>> \in cset THEN 
                             TRUE
                         ELSE IF Cardinality(cset) /= 0 THEN 
-                            /\ Print(x,TRUE)
-                            /\ Print(cset,TRUE) 
-                            /\ x \in cset
-                            \* TRUE
+                            \* /\ Print(x,TRUE)
+                            \* /\ Print(cset,TRUE) 
+                            x \in cset
+                            \* FLASE
                         ELSE  TRUE
                     )
                 )
@@ -740,6 +740,30 @@ prefixCommitted(t) == UNION {
 termSet == {currentTerm[i] : i \in Server}
 
 Lemma9PrefixCommittedIsCommited == \A t \in (1 .. Max(termSet)) : prefixCommitted(t) \subseteq committed(t)
+
+\* Theorem 1. Servers only apply entries that are committed in their current term:
+\* \A i \in Server :
+\*      /\ commitIndex[i] <= Len(log[i])
+\*      /\ \A <<index,term>> \in log[i] :
+\*          index <= commitIndex[i]) => <<index,term>> \in committed(currentTerm[i])
+\* This is equivalent to the State Machine Safety property
+Theorem1ServerApplyEntriesCommittedInCurrentTerm ==
+    \A i \in Server:
+        IF commitIndex[i] <= Len(log[i]) THEN 
+            (
+                LET cset == committed(currentTerm[i])
+                IN (
+                    IF Cardinality(cset) = 1 /\ <<0,0>> \in cset THEN 
+                        TRUE
+                    ELSE IF Cardinality(cset) /= 0 THEN 
+                        \A index \in (1 .. Len(log[i])) : 
+                            IF index <= commitIndex[i] THEN 
+                                <<index,log[i][index].term>> \in cset
+                            ELSE TRUE
+                    ELSE TRUE
+                )
+            )
+        ELSE TRUE
 
 ===============================================================================
 

@@ -1,9 +1,9 @@
 @!@!@STARTMSG 2262:0 @!@!@
 TLC2 Version 2.14 of 10 July 2019
 @!@!@ENDMSG 2262 @!@!@
-@!@!@STARTMSG 2188:0 @!@!@
-Running Random Simulation with seed 6262436792556191741 with 6 workers on 6 cores with 935MB heap and 2100MB offheap memory [pid: 15884] (Windows 10 10.0 amd64, AdoptOpenJDK 11.0.3 x86_64).
-@!@!@ENDMSG 2188 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 40 and seed -1990883904504684231 with 6 workers on 6 cores with 935MB heap and 2100MB offheap memory [pid: 1640] (Windows 10 10.0 amd64, AdoptOpenJDK 11.0.3 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
 @!@!@ENDMSG 2220 @!@!@
@@ -23,137 +23,23 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2020-04-11 15:42:33)
+Starting... (2020-04-11 16:54:34)
 @!@!@ENDMSG 2185 @!@!@
-@!@!@STARTMSG 2269:0 @!@!@
-Computed 1 initial states...
-@!@!@ENDMSG 2269 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:43:33: 23678316 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:44:33: 47784681 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:45:33: 70468900 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:46:33: 90885360 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:47:33: 110262044 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:48:33: 132130941 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:49:33: 154093156 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:50:33: 176736020 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:51:33: 198151946 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:52:33: 219551418 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:53:33: 245080537 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:54:33: 270712305 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:55:33: 296283619 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:56:33: 321795597 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:57:33: 347183420 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:58:33: 372773285 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 15:59:33: 398436975 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:00:33: 424176686 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:01:33: 446657772 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:02:33: 468392191 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:03:33: 489737520 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:04:33: 512132047 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:05:33: 536081050 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:06:33: 560495726 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:07:33: 584419930 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:08:33: 608576748 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:09:33: 629772344 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:10:33: 653274600 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:11:33: 676172786 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:12:33: 698271691 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:13:33: 720088355 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:14:33: 742534208 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:15:33: 765476946 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:16:33: 788761906 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:17:33: 810765546 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:18:33: 834555985 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:19:33: 858931379 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:20:33: 880988308 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:21:33: 902137719 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:22:33: 923850904 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:23:33: 947483921 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:24:33: 972021340 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
-@!@!@STARTMSG 2209:0 @!@!@
-Progress(-1) at 2020-04-11 16:25:33: 997236576 states generated, -1 distinct states found, -1 states left on queue.
-@!@!@ENDMSG 2209 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated at 2020-04-11 16:54:35.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(11) at 2020-04-11 16:54:38: 414,592 states generated (414,592 s/min), 80,094 distinct states found (80,094 ds/min), 56,989 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(14) at 2020-04-11 16:55:38: 22,294,576 states generated (21,879,984 s/min), 3,131,919 distinct states found (3,051,825 ds/min), 2,070,670 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(15) at 2020-04-11 16:56:39: 46,350,747 states generated (24,056,171 s/min), 6,241,847 distinct states found (3,109,928 ds/min), 4,102,547 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(15) at 2020-04-11 16:57:39: 68,610,166 states generated (22,259,419 s/min), 8,881,571 distinct states found (2,639,724 ds/min), 5,755,724 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
