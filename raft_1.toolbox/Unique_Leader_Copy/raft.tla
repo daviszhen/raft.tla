@@ -163,9 +163,6 @@ WithoutMessage(m, msgs) ==
         [msgs EXCEPT ![m] = IF msgs[m] > 0 THEN msgs[m] - 1 ELSE 0 ]
     ELSE
         msgs
-        
-ValidMessage(msgs) ==
-    { m \in DOMAIN messages : msgs[m] > 0 }
 
 ValidMessage(msgs) ==
     { m \in DOMAIN messages : msgs[m] > 0 }
