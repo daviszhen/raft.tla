@@ -13,21 +13,30 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value=""/>
     <intAttribute key="fpBits" value="6"/>
-    <intAttribute key="fpIndex" value="77"/>
+    <intAttribute key="fpIndex" value="89"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="39"/>
     <intAttribute key="maxSetSize" value="1000000"/>
-    <booleanAttribute key="mcMode" value="true"/>
+    <booleanAttribute key="mcMode" value="false"/>
     <stringAttribute key="modelBehaviorInit" value=""/>
     <stringAttribute key="modelBehaviorNext" value=""/>
     <stringAttribute key="modelBehaviorSpec" value="Spec"/>
     <intAttribute key="modelBehaviorSpecType" value="1"/>
-    <stringAttribute key="modelBehaviorVars" value="elections, committedLogDecrease, messages, clientRequests, matchIndex, log, state, allLogs, commitIndex, currentTerm, committedLog, nextIndex, votesGranted, votesSent, voterLog, votedFor"/>
+    <stringAttribute key="modelBehaviorVars" value="elections, committedLogDecrease, messages, clientRequests, matchIndex, log, state, allLogs, oldLogs, commitIndex, currentTerm, committedLog, nextIndex, votesGranted, votesSent, voterLog, votedFor, currentTermList"/>
     <stringAttribute key="modelComments" value=""/>
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
         <listEntry value="1\lnot MoreThanOneLeader"/>
         <listEntry value="1\lnot committedLogDecrease"/>
+        <listEntry value="1Lemma1CurrentTermIncrease"/>
+        <listEntry value="1Lemma2AtMostOneLeader"/>
+        <listEntry value="1Lemma3LeaderLogGrow"/>
+        <listEntry value="1Lemma4LogPrefixMatch"/>
+        <listEntry value="1Lemma5FollowerLogIsPrefixOfLeader"/>
+        <listEntry value="1Lemma6CurrentTermAtLeastAsLargeAsTermsInLog"/>
+        <listEntry value="1Lemma7TermGrowInLog"/>
+        <listEntry value="1Lemma8ImmediatelyCommittedIsCommitted"/>
+        <listEntry value="1Lemma9PrefixCommittedIsCommited"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties"/>
     <intAttribute key="modelEditorOpenTabs" value="6"/>
@@ -42,14 +51,14 @@
         <listEntry value="Candidate;;Candidate;1;0"/>
         <listEntry value="RequestVoteRequest;;RequestVoteRequest;1;0"/>
         <listEntry value="AppendEntriesRequest;;AppendEntriesRequest;1;0"/>
-        <listEntry value="Server;;{&quot;s1&quot;,&quot;s2&quot;};0;0"/>
+        <listEntry value="Server;;{&quot;s1&quot;,&quot;s2&quot;,&quot;s3&quot;};0;0"/>
         <listEntry value="MaxClientRequests;;2;0;0"/>
     </listAttribute>
     <stringAttribute key="modelParameterContraint" value="\A i \in Server: &#13;&#10;currentTerm[i] &lt; 3"/>
     <listAttribute key="modelParameterDefinitions"/>
     <stringAttribute key="modelParameterModelValues" value="{}"/>
     <stringAttribute key="modelParameterNewDefinitions" value=""/>
-    <intAttribute key="numberOfWorkers" value="12"/>
+    <intAttribute key="numberOfWorkers" value="6"/>
     <booleanAttribute key="recover" value="false"/>
     <stringAttribute key="result.mail.address" value=""/>
     <intAttribute key="simuAril" value="-1"/>

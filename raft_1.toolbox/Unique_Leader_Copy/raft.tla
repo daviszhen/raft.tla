@@ -47,6 +47,9 @@ VARIABLE elections
 \* Keeps track of every log ever in the system (set of logs).
 VARIABLE allLogs
 
+\* save every log of every server
+VARIABLE oldLogs
+
 ----
 \* The following variables are all per server (functions with domain Server).
 
@@ -57,7 +60,11 @@ VARIABLE state
 \* The candidate the server voted for in its current term, or
 \* Nil if it hasn't voted for any.
 VARIABLE votedFor
-serverVars == <<currentTerm, state, votedFor>>
+
+\* the sequence of currentTerm for every server
+VARIABLE currentTermList
+
+serverVars == <<currentTerm, currentTermList, state, votedFor>>
 
 \* The set of requests that can go into the log
 VARIABLE clientRequests
@@ -72,7 +79,7 @@ VARIABLE commitIndex
 VARIABLE committedLog
 \* Does the commited Index decrease
 VARIABLE committedLogDecrease
-logVars == <<log, commitIndex, clientRequests, committedLog, committedLogDecrease >>
+logVars == <<log, oldLogs, commitIndex, clientRequests, committedLog, committedLogDecrease >>
 
 \* The following variables are used only on candidates:
 \* The set of servers from which the candidate has received a RequestVote
@@ -131,7 +138,7 @@ WithoutMessage(m, msgs) ==
 ValidMessage(msgs) ==
     { m \in DOMAIN messages : msgs[m] > 0 }
 
-        SingleMessage(msgs) ==
+SingleMessage(msgs) ==
     { m \in DOMAIN messages : msgs[m] = 1 } 
 
 \* Add a message to the bag of messages.
@@ -156,9 +163,11 @@ Max(s) == CHOOSE x \in s : \A y \in s : x >= y
 InitHistoryVars == /\ elections = {}
                    /\ allLogs   = {}
                    /\ voterLog  = [i \in Server |-> [j \in {} |-> <<>>]]
+                   /\ oldLogs   = [i \in Server |-> <<>>]
 InitServerVars == /\ currentTerm = [i \in Server |-> 1]
                   /\ state       = [i \in Server |-> Follower]
                   /\ votedFor    = [i \in Server |-> Nil]
+                  /\ currentTermList = [i \in Server |-> <<>>]
 InitCandidateVars == /\ votesSent = [i \in Server |-> FALSE ]
                      /\ votesGranted   = [i \in Server |-> {}]
 \* The values nextIndex[i][i] and matchIndex[i][i] are never read, since the
@@ -191,12 +200,13 @@ Restart(i) ==
     /\ nextIndex'      = [nextIndex EXCEPT ![i] = [j \in Server |-> 1]]
     /\ matchIndex'     = [matchIndex EXCEPT ![i] = [j \in Server |-> 0]]
     /\ commitIndex'    = [commitIndex EXCEPT ![i] = 0]
-    /\ UNCHANGED <<messages, currentTerm, votedFor, log, elections, clientRequests, committedLog, committedLogDecrease>>
+    /\ UNCHANGED <<messages, currentTerm, currentTermList, votedFor, log, oldLogs, elections, clientRequests, committedLog, committedLogDecrease>>
 
 \* Server i times out and starts a new election.
 Timeout(i) == /\ state[i] \in {Follower, Candidate}
               /\ state' = [state EXCEPT ![i] = Candidate]
               /\ currentTerm' = [currentTerm EXCEPT ![i] = currentTerm[i] + 1]
+              /\ currentTermList' = [currentTermList EXCEPT ![i] = Append(currentTermList[i], currentTerm[i] + 1)]
               \* Most implementations would probably just set the local vote
               \* atomically, but messaging localhost for it is weaker.
               /\ votedFor' = [votedFor EXCEPT ![i] = Nil]
@@ -258,7 +268,7 @@ BecomeLeader(i) ==
                            elog      |-> log[i],
                            evotes    |-> votesGranted[i],
                            evoterLog |-> voterLog[i]]}
-    /\ UNCHANGED <<messages, currentTerm, votedFor, candidateVars, logVars>>
+    /\ UNCHANGED <<messages, currentTerm, currentTermList, votedFor, candidateVars, logVars>>
 
 \* Leader i receives a client request to add v to the log.
 ClientRequest(i) ==
@@ -268,6 +278,7 @@ ClientRequest(i) ==
                      value |-> clientRequests]
            newLog == Append(log[i], entry)
        IN  /\ log' = [log EXCEPT ![i] = newLog]
+            /\ oldLogs' = [oldLogs EXCEPT ![i] = Append(oldLogs[i], log[i])]
            \* Make sure that each request is unique, reduce state space to be explored
            /\ clientRequests' = clientRequests + 1
     /\ UNCHANGED <<messages, serverVars, candidateVars,
@@ -302,7 +313,7 @@ AdvanceCommitIndex(i) ==
           /\ committedLogDecrease' = \/ ( newCommitIndex < Len(committedLog) )
                                      \/ \E j \in 1..Len(committedLog) : committedLog[j] /= newCommittedLog[j]
           /\ committedLog' = newCommittedLog
-    /\ UNCHANGED <<messages, serverVars, candidateVars, leaderVars, log, clientRequests>>
+    /\ UNCHANGED <<messages, serverVars, candidateVars, leaderVars, log, oldLogs, clientRequests>>
 
 ----
 \* Message handlers
@@ -329,7 +340,7 @@ HandleRequestVoteRequest(i, j, m) ==
                  msource      |-> i,
                  mdest        |-> j],
                  m)
-       /\ UNCHANGED <<state, currentTerm, candidateVars, leaderVars, logVars>>
+       /\ UNCHANGED <<state, currentTerm, currentTermList, candidateVars, leaderVars, logVars>>
 
 \* Server i receives a RequestVote response from server j with
 \* m.mterm = currentTerm[i].
@@ -375,7 +386,7 @@ HandleAppendEntriesRequest(i, j, m) ==
              /\ m.mterm = currentTerm[i]
              /\ state[i] = Candidate
              /\ state' = [state EXCEPT ![i] = Follower]
-             /\ UNCHANGED <<currentTerm, votedFor, logVars, messages>>
+             /\ UNCHANGED <<currentTerm, currentTermList, votedFor, logVars, messages>>
           \/ \* accept request
              /\ m.mterm = currentTerm[i]
              /\ state[i] = Follower
@@ -413,6 +424,7 @@ HandleAppendEntriesRequest(i, j, m) ==
                        /\ Len(log[i]) = m.mprevLogIndex
                        /\ log' = [log EXCEPT ![i] =
                                       Append(log[i], m.mentries[1])]
+                        /\ oldLogs' = [oldLogs EXCEPT  ![i] = Append(oldLogs[i], log[i])]
                        /\ UNCHANGED <<serverVars, commitIndex, messages, clientRequests, committedLog, committedLogDecrease>>
        /\ UNCHANGED <<candidateVars, leaderVars>>
 
@@ -434,6 +446,7 @@ HandleAppendEntriesResponse(i, j, m) ==
 UpdateTerm(i, j, m) ==
     /\ m.mterm > currentTerm[i]
     /\ currentTerm'    = [currentTerm EXCEPT ![i] = m.mterm]
+    /\ currentTermList' = [currentTermList EXCEPT ![i] = Append(currentTermList[i], m.mterm)]
     /\ state'          = [state       EXCEPT ![i] = Follower]
     /\ votedFor'       = [votedFor    EXCEPT ![i] = Nil]
        \* messages is unchanged so m can be processed further.
@@ -507,13 +520,226 @@ MoreThanOneLeader ==
     \E i, j \in Server :  BothLeader( i, j )
     
     
+\* Lemma 1. Each server's currentTerm monotonically increases:
+\* \A i \in Server : currentTerm[i] <= currentTerm'[i]
+Lemma1CurrentTermIncrease == \A i \in Server : \/ Len(currentTermList[i]) \in {0,1}
+                                         \/ /\ Len(currentTermList[i]) > 1
+                                            /\ \A j \in (2 .. Len(currentTermList[i])) : 
+                                                currentTermList[i][j - 1] <= currentTermList[i][j]
 
+\* Lemma 2. There is at most one leader per term:
+\* \A e,f \in  elections :
+\*      (e.eterm = f.eterm ) => (e.eleader = f.eleader)
+\* This is the Election Safety property.
+Lemma2AtMostOneLeader == \A e,f \in elections:
+                        (e.eterm = f.eterm ) => (e.eleader = f.eleader)
 
+\* Lemma 3. A leader's log monotonically grows during its term:
+\* \A e \in elections :
+\*      currentTerm[e.leader] = e.term =>
+\*      \A index \in 1 .. Len(log[e.leader]) :
+\*      log'[e.leader][index] = log[e.leader][index]
+\* This is the Leader Append-Only property.
+Lemma3LeaderLogGrow == \A e \in elections:
+        (currentTerm[e.eleader] = e.eterm) => 
+            (
+                LET oldLog == \* last log of e.eleader
+                    (
+                        IF Len(oldLogs[e.eleader]) = 0 THEN 
+                                <<>>
+                        ELSE 
+                                oldLogs[e.eleader][Len(oldLogs[e.eleader])]
+                    ) 
+                IN
+                    \* /\ state[e.eleader] = Leader
+                    /\ Len(oldLog) <= Len(log[e.eleader])
+                    /\ \/ Len(oldLog) = 0
+                        \/ \A i \in (1 .. Len(oldLog)) : oldLog[i] = log[e.eleader][i]
+            )
 
+\* Lemma 4. An <<index, term>> pair identifies a log prefix:
+\* \A l, m \in allLogs :
+\*    \A <<index, term>> \in l :
+\*       <<index, term>> \in m =>
+\*       \A pindex \in 1 .. index:
+\*          l[pindex] = m[pindex]
+\* This is the Log Matching property.
+Lemma4LogPrefixMatch == \A l,m \in allLogs: 
+        \A index \in (1 .. Min({Len(l),Len(m)})): 
+            (l[index].term = m[index].term) =>
+                (\A j \in (1 .. index) : l[j].term = m[j].term)
 
+\* Lemma 5. When a follower appends an entry to its log, its log after the append is a prefix of the
+\* leader's log at the time the leader sent the AppendEntries request:
+\* \A i \in Server :
+\*      state[i] /= Leader /\ Len(log'[i]) > Len(log[i]) =>
+\*          \E m \in DOMAIN messages :
+\*              /\ m.mtype = AppendEntriesRequest
+\*              /\ \A index \in (1 .. Len(log'[i])):
+\*                  log'[i][index] = m.mlog[index]
+Lemma5FollowerLogIsPrefixOfLeader ==
+        \A i \in Server:
+            (state[i] /= Leader /\ Len(oldLogs[i]) < Len(log[i])) =>
+            (
+                \E m \in DOMAIN messages:
+                    /\ m.mtype = AppendEntriesRequest
+                    /\ \A index \in (1 .. Len(log[i])) : 
+                        log[i][index] = m.mlog[index]
+            )
 
+\* Lemma 6. A server's current term is always at least as large as the terms in its log:
+\* \A i \in Server :
+\*      \A <<index, term>> \in log[i]:
+\*          term <= currentTerm[i]
+Lemma6CurrentTermAtLeastAsLargeAsTermsInLog ==
+        \A i \in Server:
+            \A index \in (1 .. Len(log[i])): log[i][index].term <= currentTerm[i]
 
+\* Lemma 7. The terms of entries grow monotonically in each log:
+\* \A l \in allLogs :
+\*      \A index \in (1 .. (Len(l) - 1)):
+\*          l[index].term <= l[index +1].term
+Lemma7TermGrowInLog == 
+        \A l \in allLogs :
+            \A index \in (1 .. (Len(l) - 1)):
+                l[index].term <= l[index+1].term
 
+\* Definition 1. An entry <<index,term> is committed at term t if it is present in every leader's log
+\* following t :
+\*      committed(t) == { <<index,term>> :
+\*                          \A election \in elections :
+\*                              election.eterm > t => <<index,term>> \in election.elog}
+entriesInElectionLog(election) == {
+    (
+        <<index,election.elog[index].term>>
+    ) : index \in (1 .. Len(election.elog))
+}
+
+committed(t) == {   (IF election.eterm > t THEN (
+                                                LET entriesInElection == UNION entriesInElectionLog(election)
+                                                IN (
+                                                        IF Cardinality(entriesInElection) /= 0 THEN 
+                                                            entriesInElection
+                                                        ELSE <<0,0>>
+                                                    )
+                                                )
+                    ELSE <<0,0>>
+                    ): election \in elections
+                }
+
+\* Definition 2. An entry <<index,term>> is immediately committed if it is acknowledged by a quorum
+\* (including the leader) during term. Lemma 8 shows that these entries are committed at term.
+\* immediatelyCommitted == { <<index,term>> \in anyLog :
+\*                              /\ anyLog \in allLogs
+\*                              /\ \E leader \in Server, subquorum \in SUBSET Server :
+\*                                  /\ subquorum \union {leader} \in Quorum
+\*                                  /\ \A i \in subquorum :
+\*                                      \E m \in messages :
+\*                                          /\ m.mtype = AppendEntriesResponse
+\*                                          /\ m.msource = i
+\*                                          /\ m.mdest = leader
+\*                                          /\ m.mterm = term
+\*                                          /\ m.mmatchIndex >= index
+
+\* validSubquorum == <<leader, subquorum>>
+leaderTimesSubquorum == { x \in Server \times SUBSET Server  : ((x[2] \union {x[1]}) \in Quorum) }
+
+entriesCommitted(leader,subquorum,m,index,term) == 
+    {
+        IF     /\ m.mtype = AppendEntriesResponse
+                /\ m.msource = i
+                /\ m.mdest = leader
+                /\ m.mterm = term
+                /\ m.mmatchIndex >= index
+        THEN <<index,term>>
+        ELSE <<0,0>>
+        : i \in subquorum
+    }
+
+committedSetOfAnyLog(anyLog) == 
+    IF Cardinality(DOMAIN messages) = 0 \/ Len(anyLog) = 0 THEN 
+        {}
+    ELSE
+        UNION {
+            (
+                entriesCommitted(x[1],x[2],m,index,anyLog[index].term)
+            ) : x \in leaderTimesSubquorum, m \in DOMAIN messages, index \in (1 .. Len(anyLog))
+        }
+
+immediatelyCommitted == UNION {
+                           committedSetOfAnyLog(anyLog) : anyLog \in allLogs
+                        }
+
+\* Lemma 8. Immediately committed entries are committed:
+\* \A <<index,term>> \in immediatelyCommitted :
+\*      <<index,term>> \in committed(term)
+\* Along with Lemma 9, this is the Leader Completeness property
+Lemma8ImmediatelyCommittedIsCommitted == 
+    (
+        IF Cardinality(immediatelyCommitted) /= 0 THEN 
+            \A x \in immediatelyCommitted: 
+                IF x = <<0,0>> THEN \* x is <<0,0>>,so it is committed
+                    TRUE
+                ELSE 
+                (
+                    LET cset == committed(x[2])
+                    IN (
+                        \* there is only <<0,0>> in cset. it means actually cset is empty set.
+                        IF Cardinality(cset) = 1 /\ <<0,0>> \in cset THEN 
+                            TRUE
+                        ELSE IF Cardinality(cset) /= 0 THEN 
+                            /\ Print(x,TRUE)
+                            /\ Print(cset,TRUE) 
+                            /\ x \in cset
+                            \* TRUE
+                        ELSE  TRUE
+                    )
+                )
+        ELSE TRUE
+    )
+
+\* Definition 3. An entry <<index, term>> is prefix committed at term t if there is another entry that
+\* is committed at term t following it in some log. Lemma 9 shows that these entries are committed at
+\* term t .
+\* prefixCommitted(t) == { <<index, term>> \in anyLog :
+\*                          /\ anyLog \in allLogs
+\*                          /\ \E <<rindex, rterm>> \in anyLog :
+\*                              /\ index < rindex
+\*                              /\ <<rindex,rterm>> \in committed(t) }
+
+followingEntries(t,index,anyLog) ==
+    IF Len(anyLog) = 0 \/ index >= Len(anyLog) THEN 
+        {}
+    ELSE 
+        {
+            (
+                IF <<j,anyLog[j].term>> \in committed(t) THEN 
+                    <<j,anyLog[j].term>>
+                ELSE <<0,0>>
+            )
+            : j \in (index .. Len(anyLog))
+        }
+
+prefixCommittedSetOfAnyLog(t,anyLog) == 
+    IF Len(anyLog) = 0 THEN 
+        {}
+    ELSE 
+        UNION {
+            (
+                followingEntries(t,index+1,anyLog)
+            ) : index \in (1 .. Len(anyLog))
+        }
+
+prefixCommitted(t) == UNION {
+                        prefixCommittedSetOfAnyLog(t,anyLog) : anyLog \in allLogs
+                    }
+
+\* Lemma 9. Prefix committed entries are committed in the same term:
+\* \A t : prexCommitted(t) \subseteq committed(t)
+\* Along with Lemma 8, this is the Leader Completeness property
+termSet == {currentTerm[i] : i \in Server}
+
+Lemma9PrefixCommittedIsCommited == \A t \in (1 .. Max(termSet)) : prefixCommitted(t) \subseteq committed(t)
 
 ===============================================================================
 
