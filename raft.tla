@@ -167,9 +167,6 @@ WithoutMessage(m, msgs) ==
 ValidMessage(msgs) ==
     { m \in DOMAIN messages : msgs[m] > 0 }
 
-ValidMessage(msgs) ==
-    { m \in DOMAIN messages : msgs[m] > 0 }
-
 SingleMessage(msgs) ==
     { m \in DOMAIN messages : msgs[m] = 1 } 
 
